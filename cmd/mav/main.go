@@ -48,10 +48,19 @@ func statusCmd(simulators simulator.SimulatorsInterface) *cobra.Command {
 		Short: "Print position of the drone with id drone and message number",
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
-			id, _ := strconv.Atoi(args[0])
-			n, _ := strconv.Atoi(args[1])
+			id, err := strconv.Atoi(args[0])
+			if err != nil {
+				log.Println("id must be a number")
+				return
+			}
+			n, err := strconv.Atoi(args[1])
+			if err != nil {
+				log.Println("message number must be a number")
+				return
+			}
+
 			if n < 0 {
-				log.Println(",message number must be positive")
+				log.Println("message number must be positive")
 				return
 			}
 			if n > 100 {
@@ -65,16 +74,12 @@ func statusCmd(simulators simulator.SimulatorsInterface) *cobra.Command {
 				return
 			}
 
-			sim.Messages.Do(func(value interface{}) {
-				if n == 0 {
-					if msg, ok := value.(*ardupilotmega.MessageGpsRawInt); ok {
-						log.Printf("SIM ID: %d - Lattitude: %d Longtitude: %d Altitude: %d\n", id, msg.Lat, msg.Lon, msg.Alt)
-					} else {
-						log.Println("No message available")
-					}
-				}
-				n--
-			})
+			msgRing := sim.Messages.Move(n)
+			if msg, ok := msgRing.Value.(*ardupilotmega.MessageGpsRawInt); ok {
+				log.Printf("SIM ID: %d - Lattitude: %d Longtitude: %d Altitude: %d\n", id, msg.Lat, msg.Lon, msg.Alt)
+			} else {
+				log.Println("No message available")
+			}
 		},
 	}
 }

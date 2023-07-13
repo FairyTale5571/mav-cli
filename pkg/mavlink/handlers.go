@@ -20,23 +20,20 @@ func NewHandler(node *gomavlib.Node, simulators simulator.SimulatorsInterface) *
 	}
 }
 
-func (h *Handler) HandleMessages(id int) func() error {
-	return func() error {
-		for evt := range h.node.Events() {
-			select {
-			case <-h.done:
-				return nil
-			default:
-				if frm, ok := evt.(*gomavlib.EventFrame); ok {
-					sim, exists := h.simulators.Get(id)
-					if !exists {
-						h.simulators.Add(id)
-					}
-					h.handleFrame(frm, sim)
+func (h *Handler) HandleMessages(id int) {
+	for evt := range h.node.Events() {
+		select {
+		case <-h.done:
+			return
+		default:
+			if frm, ok := evt.(*gomavlib.EventFrame); ok {
+				sim, exists := h.simulators.Get(id)
+				if !exists {
+					h.simulators.Add(id)
 				}
+				h.handleFrame(frm, sim)
 			}
 		}
-		return nil
 	}
 }
 
