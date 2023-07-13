@@ -74,11 +74,23 @@ func statusCmd(simulators simulator.SimulatorsInterface) *cobra.Command {
 				return
 			}
 
-			msgRing := sim.Messages.Move(n)
-			if msg, ok := msgRing.Value.(*ardupilotmega.MessageGpsRawInt); ok {
-				log.Printf("SIM ID: %d - Lattitude: %d Longtitude: %d Altitude: %d\n", id, msg.Lat, msg.Lon, msg.Alt)
+			msgRing := sim.Messages
+			numMessages := msgRing.Len()
+
+			if numMessages > 0 {
+				startIndex := numMessages - n
+				if startIndex < 0 {
+					startIndex = 0
+				}
+				for i := startIndex; i < numMessages; i++ {
+					msg := msgRing.Move(i).Value
+					if msg, ok := msg.(*ardupilotmega.MessageGpsRawInt); ok {
+						log.Printf("SIM ID: %d - Latitude: %d Longitude: %d Altitude: %d\n", id, msg.Lat, msg.Lon, msg.Alt)
+						log.Println(msg)
+					}
+				}
 			} else {
-				log.Println("No message available")
+				log.Println("No messages available")
 			}
 		},
 	}
