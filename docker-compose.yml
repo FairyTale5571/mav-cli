@@ -1,0 +1,22 @@
+version: '3'
+services:
+  px4-sitl:
+    image: radarku/px4-sitl
+    restart: "no"
+    working_dir: /Firmware
+    environment:
+      - PX4_HOME_LAT=42.3898
+      - PX4_HOME_LON=-71.1476
+      - PX4_HOME_ALT=14.2
+    ports:
+      - "5761:5760"
+  px4-sitl_2:
+    image: radarku/px4-sitl
+    restart: "no"
+    working_dir: /Firmware
+    environment:
+      - PX4_HOME_LAT=42.3898
+      - PX4_HOME_LON=-71.1476
+      - PX4_HOME_ALT=14.2
+    ports:
+      - "5760:5760"
