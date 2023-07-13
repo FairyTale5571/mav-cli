@@ -23,6 +23,11 @@ nodes:
 ```
 
 
+#### Usage: 
+
+`px4-list` - return all connected nodes
+`status <node> <message number>` - get GPS position of node in message number can not be more than 100
+
 #### Known issues:
 
 Containers won't start from docker-compose
